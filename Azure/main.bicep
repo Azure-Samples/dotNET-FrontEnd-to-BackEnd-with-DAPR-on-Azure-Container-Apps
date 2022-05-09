@@ -67,17 +67,6 @@ module inventory 'container_app.bicep' = {
 }
 
 // create the store api container app
-var frontend_config = [
-  {
-    name: 'ProductsApi'
-    value: 'http://${products.outputs.fqdn}'
-  }
-  {
-    name: 'InventoryApi'
-    value: 'http://${inventory.outputs.fqdn}'
-  }
-]
-
 module store 'container_app.bicep' = {
   name: 'store'
   params: {
@@ -87,7 +76,7 @@ module store 'container_app.bicep' = {
     registryUsername: acr.listCredentials().username
     containerAppEnvironmentId: env.outputs.id
     registry: acr.name
-    envVars: union(shared_config, frontend_config)
+    envVars: shared_config
     externalIngress: true
   }
 }
