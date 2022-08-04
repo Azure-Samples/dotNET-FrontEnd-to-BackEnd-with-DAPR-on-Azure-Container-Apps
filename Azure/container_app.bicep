@@ -1,6 +1,6 @@
 param name string
 param location string = resourceGroup().location
-param containerAppEnvironmentId string = '"/subscriptions/c1fdca6a-af12-4a5a-90d3-fd64c554d9e7/resourceGroups/apwaug3/providers/Microsoft.App/connectedEnvironments/apwaug3-kubeenv'
+param containerAppEnvironmentId string
 param repositoryImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
 param envVars array = []
 param registry string
@@ -18,12 +18,8 @@ param registryPassword string
 resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' ={
   name: name
   location: location
-  extendedLocation: {
-        name: '/subscriptions/c1fdca6a-af12-4a5a-90d3-fd64c554d9e7/resourceGroups/apwaug3/providers/Microsoft.ExtendedLocation/customLocations/apwaug3',
-        type: 'CustomLocation'
-    },
   properties:{
-    environmentId: containerAppEnvironmentId
+    managedEnvironmentId: containerAppEnvironmentId
     configuration: {
       dapr: {
         enabled: true

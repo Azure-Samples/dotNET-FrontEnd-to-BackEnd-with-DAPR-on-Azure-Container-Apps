@@ -25,21 +25,20 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-//resource env 'Microsoft.App/connectedEnvironments@2022-06-01-preview' = {
-//  name: '${baseName}env'
-// location: location
-//  
-//  properties: {
-//    appLogsConfiguration: {
-//      destination: 'log-analytics'
-//      logAnalyticsConfiguration: {
-//        customerId: logs.properties.customerId
-//        sharedKey: logs.listKeys().primarySharedKey
-//      }
-//    }
-//  }
-//}
+resource env 'Microsoft.App/managedEnvironments@2022-01-01-preview' = {
+  name: '${baseName}env'
+  location: location
+  properties: {
+    appLogsConfiguration: {
+      destination: 'log-analytics'
+      logAnalyticsConfiguration: {
+        customerId: logs.properties.customerId
+        sharedKey: logs.listKeys().primarySharedKey
+      }
+    }
+  }
+}
 
-//output id string = env.id
+output id string = env.id
 output appInsightsInstrumentationKey string = appInsights.properties.InstrumentationKey
 output appInsightsConnectionString string = appInsights.properties.ConnectionString

@@ -8,13 +8,10 @@ on:
 env:
   
   # alphanumeric string under 14 characters
-  RESOURCE_GROUP_NAME: apwaug3
+  RESOURCE_GROUP_NAME: store
 
   # specify your preferred region
   REGION: eastus
-  
-  # aca region
-  ACAREGION: northcentralusstage
 
   STORE_DOCKER: Store/Dockerfile
   STORE_IMAGE: store
@@ -121,7 +118,7 @@ jobs:
         inlineScript: >
           az config set extension.use_dynamic_install=yes_without_prompt
 
-          az extension add -s https://containerappcli.blob.core.windows.net/containerapp/containerapp-0.3.9-py2.py3-none-any.whl
+          az extension add --name containerapp --yes
 
     - name: Login to ACR
       run: |
