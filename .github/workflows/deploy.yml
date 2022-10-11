@@ -8,7 +8,7 @@ on:
 env:
   
   # alphanumeric string under 14 characters
-  RESOURCE_GROUP_NAME: ui-aca-1
+  RESOURCE_GROUP_NAME: UiACA
 
   # specify your preferred region
   REGION: eastus
