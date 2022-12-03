@@ -3,14 +3,10 @@ name: Build and deploy .NET application to Container App silo
 on:
   push:
     branches:
-    - deploy
+      [ deploy ]
 
 env:
-  
-  # alphanumeric string under 14 characters
   RESOURCE_GROUP_NAME: store
-
-  # specify your preferred region
   REGION: eastus
 
   STORE_DOCKER: Store/Dockerfile
@@ -25,7 +21,6 @@ env:
 jobs:
   provision:
     runs-on: ubuntu-latest
-
     steps:
 
     - name: Checkout to the branch
