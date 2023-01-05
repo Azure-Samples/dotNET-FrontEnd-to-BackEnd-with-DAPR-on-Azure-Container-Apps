@@ -11,7 +11,7 @@ env:
   RESOURCE_GROUP_NAME: rg-webapi
 
   # specify your preferred region
-  REGION: eastus
+  REGION: westeurope
 
   STORE_DOCKER: Store/Dockerfile
   STORE_IMAGE: store
