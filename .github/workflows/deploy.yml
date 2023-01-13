@@ -3,15 +3,15 @@ name: Build and deploy .NET application to Container App silo
 on:
   push:
     branches:
-    - deploy
+    - main
 
 env:
   
   # alphanumeric string under 14 characters
-  RESOURCE_GROUP_NAME: store
+  RESOURCE_GROUP_NAME: container-store-demo
 
   # specify your preferred region
-  REGION: eastus
+  REGION: centralus
 
   STORE_DOCKER: Store/Dockerfile
   STORE_IMAGE: store
