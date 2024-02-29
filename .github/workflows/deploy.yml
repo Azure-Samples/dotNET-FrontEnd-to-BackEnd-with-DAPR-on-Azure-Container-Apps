@@ -11,7 +11,7 @@ env:
   RESOURCE_GROUP_NAME: store
 
   # specify your preferred region
-  REGION: eastus
+  REGION: westeurope
 
   STORE_DOCKER: Store/Dockerfile
   STORE_IMAGE: store
@@ -45,6 +45,8 @@ jobs:
 
           az group create -l ${{ env.REGION }} -n ${{ env.RESOURCE_GROUP_NAME }}
 
+    - run: ls
+    
     - name: Creating resources
       uses: azure/CLI@v1
       with:
