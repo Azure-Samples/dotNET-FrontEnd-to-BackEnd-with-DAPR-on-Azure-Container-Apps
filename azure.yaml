@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: dotNET-FrontEnd-to-BackEnd-with-DAPR-on-Azure-Container-Apps
+metadata:
+    template: frontend-backend-dapr-aca@1.0.0
+services:
+    Store:
+        project: src/Store
+        host: containerapp
+        language: dotnet
+        docker:
+            # These paths are relative to the project directory
+            path: ./Dockerfile
+            context: ./../
+    Store.InventoryApi:
+        project: src/Store.InventoryApi
+        host: containerapp
+        language: dotnet
+        docker:
+            # These paths are relative to the project directory
+            path: ./Dockerfile
+            context: ./../
+    Store.ProductApi:
+        project: src/Store.ProductApi
+        host: containerapp
+        language: dotnet
+        docker:
+            # These paths are relative to the project directory
+            path: ./Dockerfile
+            context: ./../

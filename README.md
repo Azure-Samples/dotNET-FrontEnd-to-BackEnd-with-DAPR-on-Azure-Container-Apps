@@ -5,7 +5,7 @@ This repository contains a simple scenario built to demonstrate how ASP.NET Core
 * Store - A Blazor server project representing the frontend of an online store. The store's UI shows a list of all the products in the store, and their associated inventory status. 
 * Products API - A simple API that generates fake product names using the open-source NuGet package [Bogus](https://github.com/bchavez/Bogus). 
 * Inventory API - A simple API that provides a random number for a given product ID string. The values of each string/integer pair are stored in memory cache so they are consistent between API calls. 
-* Azure folder - contains Azure Bicep files used for creating and configuring all the Azure resources. 
+* Infra folder - contains Azure Bicep files used for creating and configuring all the Azure resources. 
 * GitHub Actions workflow file used to deploy the app using CI/CD. 
 
 ## What you'll learn
@@ -23,7 +23,8 @@ You'll need an Azure subscription and a very small set of tools and skills to ge
 
 1. An Azure subscription. Sign up [for free](https://azure.microsoft.com/free/).
 2. A GitHub account, with access to GitHub Actions.
-3. Either the [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli) installed locally, or, access to [GitHub Codespaces](https://github.com/features/codespaces), which would enable you to do develop in your browser.
+3. Either the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-windows) installed locally, or, access to [GitHub Codespaces](https://github.com/features/codespaces), which would enable you to do develop in your browser.
+4. Docker Desktop installed locally, or, access to a [Docker Desktop Codespace](https://docs.github.com/en/codespaces/getting-started/deep-dive)
 
 ## Topology diagram
 
@@ -31,75 +32,34 @@ The resultant application is an Azure Container Environment-hosted set of contai
 
 ![Application topology](docs/media/topology.png)
 
-Internet traffic should not be able to directly access either of the back-end APIs as each of these containers is marked as "internal ingress only" during the deployment phase. Internet traffic hitting the `store.<your app>.<your region>.azurecontainerapps.io` URL should be proxied to the `frontend` container, which in turn makes outbound calls to both the `products` and `inventory` APIs within the Azure Container Apps Environment.
+Internet traffic should not be able to directly access either of the back-end APIs as each of these containers is marked as "internal ingress only" during the deployment phase. Internet traffic hitting the `<aca name>.<your app>.<your region>.azurecontainerapps.io` URL should be proxied to the `frontend` container, which in turn makes outbound calls to both the `products` and `inventory` APIs within the Azure Container Apps Environment.
 
 ## Setup
 
 By the end of this section you'll have a 3-node app running in Azure. This setup process consists of two steps, and should take you around 15 minutes. 
 
-1. Use the Azure CLI to create an Azure Service Principal, then store that principal's JSON output to a GitHub secret so the GitHub Actions CI/CD process can log into your Azure subscription and deploy the code.
-2. Edit the ` deploy.yml` workflow file and push the changes into a new `deploy` branch, triggering GitHub Actions to build the .NET projects into containers and push those containers into a new Azure Container Apps Environment. 
-
-## Authenticate to Azure and configure the repository with a secret
-
 1. Fork this repository to your own GitHub organization.
-2. Create an Azure Service Principal using the Azure CLI. 
 
-```bash
-$subscriptionId=$(az account show --query id --output tsv)
-az ad sp create-for-rbac --sdk-auth --name WebAndApiSample --role contributor --scopes /subscriptions/$subscriptionId
+## Deploy the code using `AZD` CLI
+
+The easiest way to deploy the code is to use the `AZD` CLI. This CLI is a wrapper around the Azure CLI that simplifies the process of deploying Azure resources. Run the following commands:
+
+```pwsh
+azd auth login --tenant-id <tenantname>.onmicrosoft.com
 ```
-
-3. Copy the JSON written to the screen to your clipboard. 
-
-```json
-{
-  "clientId": "",
-  "clientSecret": "",
-  "subscriptionId": "",
-  "tenantId": "",
-  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com/",
-  "resourceManagerEndpointUrl": "https://brazilus.management.azure.com",
-  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
-  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
-  "galleryEndpointUrl": "https://gallery.azure.com",
-  "managementEndpointUrl": "https://management.core.windows.net"
-}
-```
-
-4. Create a new GitHub secret in your fork of this repository named `AzureSPN`. Paste the JSON returned from the Azure CLI into this new secret. Once you've done this you'll see the secret in your fork of the repository.
-
-   ![The AzureSPN secret in GitHub](docs/media/secrets.png)
-
-> Note: Never save the JSON to disk, for it will enable anyone who obtains this JSON code to create or edit resources in your Azure subscription. 
 
 ## Deploy the code using GitHub Actions
 
-The easiest way to deploy the code is to make a commit directly to the `deploy` branch. Do this by navigating to the `deploy.yml` file in your browser and clicking the `Edit` button. 
+The `AZD` CLI is available as a GitHub Action, so you can use it in your CI/CD workflows.
 
-![Edit the deployment workflow file.](docs/media/edit-the-deploy-file.png)
+This repo contains a GitHub Actions workflow file that deploys the code to Azure Container Apps. The workflow file is located at `.github/workflows/azure-dev.yml`.
 
-Provide a custom resource group name for the app, and then commit the change to a new branch named `deploy`. 
+Run the following command to configure the GitHub Actions workflow:
 
-![Create the deploy branch.](docs/media/deploy.png)
-
-Once you click the `Propose changes` button, you'll be in "create a pull request" mode. Don't worry about creating the pull request yet, just click on the `Actions` tab, and you'll see that the deployment CI/CD process has already started. 
-
-![Build started.](docs/media/deploy-started.png)
-
-When you click into the workflow, you'll see that there are 3 phases the CI/CD will run through:
-
-1. provision - the Azure resources will be created that eventually house your app.
-2. build - the various .NET projects are build into containers and published into the Azure Container Registry instance created during provision.
-3. deploy - once `build` completes, the images are in ACR, so the Azure Container Apps are updated to host the newly-published container images. 
-
-![Deployment phases.](docs/media/cicd-phases.png)
-
-After a few minutes, all three steps in the workflow will be completed, and each box in the workflow diagram will reflect success. If anything fails, you can click into the individual process step to see the detailed log output. 
-
-> Note: if you do see any failures or issues, please submit an Issue so we can update the sample. Likewise, if you have ideas that could make it better, feel free to submit a pull request.
-
-![Deployment success.](docs/media/success.png)
+```pwsh
+azd pipeline config
+```
+The workflow file is triggered by a push to the `main` branch.
 
 With the projects deployed to Azure, you can now test the app to make sure it works. 
 
